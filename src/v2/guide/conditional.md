@@ -6,26 +6,19 @@ order: 7
 
 ## `v-if`
 
-在字符串模板中，比如 Handlebars，我们得像这样写一个条件块：
+<div class="vueschool"><a href="https://learning.dcloud.io/#/?vid=8" target="_blank" rel="sponsored noopener" title="Vue.js 教程 - 条件渲染">观看本节视频讲解</a></div>
+
+`v-if` 指令用于条件性地渲染一块内容。这块内容只会在指令的表达式返回 truthy 值的时候被渲染。
 
 ``` html
-<!-- Handlebars 模板 -->
-{{#if ok}}
-  <h1>Yes</h1>
-{{/if}}
-```
-
-在 Vue 中，我们使用 `v-if` 指令实现同样的功能：
-
-``` html
-<h1 v-if="ok">Yes</h1>
+<h1 v-if="awesome">Vue is awesome!</h1>
 ```
 
 也可以用 `v-else` 添加一个“else 块”：
 
 ``` html
-<h1 v-if="ok">Yes</h1>
-<h1 v-else>No</h1>
+<h1 v-if="awesome">Vue is awesome!</h1>
+<h1 v-else>Oh no 😢</h1>
 ```
 
 ### 在 `<template>` 元素上使用 `v-if` 条件渲染分组
@@ -126,7 +119,7 @@ new Vue({
 </script>
 {% endraw %}
 
-这样也不总是符合实际需求，所以 Vue 为你提供了一种方式来表达“这两个元素是完全独立的，不要复用它们”。只需添加一个具有唯一值的 `key` 属性即可：
+这样也不总是符合实际需求，所以 Vue 为你提供了一种方式来表达“这两个元素是完全独立的，不要复用它们”。只需添加一个具有唯一值的 `key` attribute 即可：
 
 ``` html
 <template v-if="loginType === 'username'">
@@ -170,7 +163,7 @@ new Vue({
 </script>
 {% endraw %}
 
-注意，`<label>` 元素仍然会被高效地复用，因为它们没有添加 `key` 属性。
+注意，`<label>` 元素仍然会被高效地复用，因为它们没有添加 `key` attribute。
 
 ## `v-show`
 
@@ -180,7 +173,7 @@ new Vue({
 <h1 v-show="ok">Hello!</h1>
 ```
 
-不同的是带有 `v-show` 的元素始终会被渲染并保留在 DOM 中。`v-show` 只是简单地切换元素的 CSS 属性 `display`。
+不同的是带有 `v-show` 的元素始终会被渲染并保留在 DOM 中。`v-show` 只是简单地切换元素的 CSS property `display`。
 
 <p class="tip">注意，`v-show` 不支持 `<template>` 元素，也不支持 `v-else`。</p>
 
@@ -196,6 +189,6 @@ new Vue({
 
 ## `v-if` 与 `v-for` 一起使用
 
-当 `v-if` 与 `v-for` 一起使用时，`v-for` 具有比 `v-if` 更高的优先级。
+<p class="tip">**不推荐**同时使用 `v-if` 和 `v-for`。请查阅[风格指南](/v2/style-guide/#避免-v-if-和-v-for-用在一起-必要)以获取更多信息。</p>
 
-请查阅 [列表渲染指南](list.html#v-for-with-v-if) 以获取详细信息。
+当 `v-if` 与 `v-for` 一起使用时，`v-for` 具有比 `v-if` 更高的优先级。请查阅[列表渲染指南](list.html#v-for-with-v-if)以获取详细信息。

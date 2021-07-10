@@ -1,3 +1,4 @@
+// inline: special logic for cn
 @import "_fonts"
 @import "_settings"
 @import "_syntax"
@@ -37,7 +38,7 @@ code, pre
   -moz-osx-font-smoothing: initial
 
 code
-  color: #e96900
+  color: #d63200
   padding: 3px 5px
   margin: 0 2px
   border-radius: 2px
@@ -49,7 +50,8 @@ em
 p
   word-spacing: 0.05em
 
-a.button
+a.button,
+input.button
   padding: 0.75em 2em
   border-radius: 2em
   display: inline-block
@@ -74,52 +76,9 @@ a.button
     color: $light
     border-color: #f6f6f6
 
-.highlight
-  overflow-x: auto
-  background-color: $codebg
-  padding: .4em 0 0
-  line-height: 1.1em
-  border-radius: $radius
-  position: relative
-  table, tr, td
-    width: 100%
-    border-collapse: collapse
-    padding: 0
-    margin: 0
-  .gutter
-    width: 1.5em
-  .code
-    $code-line-height = 1.5em
-    pre
-      padding: 1.2em 1.4em
-      line-height: $code-line-height
-      margin: 0
-    .line
-      min-height: $code-line-height
-  &.html, &.js, &.bash, &.css
-    .code:before
-      position: absolute
-      top: 0
-      right: 0
-      color: #ccc
-      text-align: right
-      font-size: .75em
-      padding: 5px 10px 0
-      line-height: 15px
-      height: 15px
-      font-weight: 600
-  &.html .code:before
-    content: "HTML"
-  &.js .code:before
-    content: "JS"
-  &.bash .code:before
-    content: "Shell"
-  &.css .code:before
-    content: "CSS"
-
 #main
   position: relative
-  z-index: 1
+  z-index: $z-base
   padding: 0 60px 30px
   overflow-x: hidden
 
@@ -133,8 +92,6 @@ a.button
     &:hover
       .nav-dropdown
         display: block
-    &.language, &.ecosystem
-      margin-left: 20px
     .arrow
       pointer-events: none
   .nav-dropdown
@@ -172,7 +129,6 @@ a.button
       border-top: 1px solid #eee
     a
       color: lighten($dark, 10%)
-      font-size: .9em
       display: block
       &:hover
         color: $green
@@ -186,10 +142,34 @@ a.button
     height: 0
     border-left: 4px solid transparent
     border-right: 4px solid transparent
-    border-top: 5px solid #ccc
+    border-top: 5px solid $light
 
 sup.beta.beta
   font-size: .6em
   margin-left: .7em
   text-transform: uppercase
   opacity: .6
+
+@media print
+  body
+    color: rgb(0,0,0)
+  .highlight
+    padding: 0
+    page-break-inside: avoid
+    .code
+      pre
+        color: rgb(0,0,0)
+        background-color: rgb(255,255,255)
+        border-style: solid
+        border-width: 2px 2px 2px 2px
+        border-color: #e8e8e8
+        page-break-inside: avoid
+  h1,h2,h3,h4,h5
+    color: rgb(0,0,0)
+    page-break-after: avoid
+    page-break-before: avoid
+  img
+    page-break-inside: avoid
+  h2+p
+    page-break-before: avoid
+  a:link:after, a:visited:after { content:" [" attr(href) "] "; }

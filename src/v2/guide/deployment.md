@@ -1,8 +1,10 @@
 ---
 title: 生产环境部署
 type: guide
-order: 401
+order: 404
 ---
+
+> 以下大多数内容在你使用 [Vue CLI](https://cli.vuejs.org/zh/) 时都是默认开启的。该章节仅跟你自定义的构建设置有关。
 
 ## 开启生产环境模式
 
@@ -14,11 +16,19 @@ order: 401
 
 ### 使用构建工具
 
-当使用 webpack 或 Browserify 类似的构建工具时，Vue 源码会根据 `process.env.NODE_ENV` 决定是否启用生产环境模式，默认情况为开发环境模式。在 webpack 与 Browserify 中都有方法来覆盖此变量，以启用 Vue 的生产环境模式，同时在构建过程中警告语句也会被压缩工具去除。这些所有 `vue-cli` 模板中都预先配置好了，但了解一下怎样配置会更好。
+当使用 webpack 或 Browserify 类似的构建工具时，Vue 源码会根据 `process.env.NODE_ENV` 决定是否启用生产环境模式，默认情况为开发环境模式。在 webpack 与 Browserify 中都有方法来覆盖此变量，以启用 Vue 的生产环境模式，同时在构建过程中警告语句也会被压缩工具去除。所有这些在 `vue-cli` 模板中都预先配置好了，但了解一下怎样配置会更好。
 
 #### webpack
 
-使用 webpack 的 [DefinePlugin](https://webpack.github.io/docs/list-of-plugins.html#defineplugin) 来指定生产环境，以便在压缩时可以让 UglifyJS 自动删除警告代码块。例如配置：
+在 webpack 4+ 中，你可以使用 `mode` 选项：
+
+``` js
+module.exports = {
+  mode: 'production'
+}
+```
+
+但是在 webpack 3 及其更低版本中，你需要使用 [DefinePlugin](https://webpack.js.org/plugins/define-plugin/)：
 
 ``` js
 var webpack = require('webpack')
@@ -28,14 +38,7 @@ module.exports = {
   plugins: [
     // ...
     new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
+      'process.env.NODE_ENV': JSON.stringify('production')
     })
   ]
 }
@@ -44,7 +47,7 @@ module.exports = {
 #### Browserify
 
 - 在运行打包命令时将 `NODE_ENV` 设置为 `"production"`。这等于告诉 `vueify` 避免引入热重载和开发相关的代码。
-- 对打包后的文件进行一次全局的 [envify](https://github.com/hughsk/envify) 转换。这使得压缩工具能清除调 Vue 源码中所有用环境变量条件包裹起来的警告语句。例如：
+- 对打包后的文件进行一次全局的 [envify](https://github.com/hughsk/envify) 转换。这使得压缩工具能清除掉 Vue 源码中所有用环境变量条件包裹起来的警告语句。例如：
 
 ``` bash
 NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js
@@ -53,7 +56,7 @@ NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js
 - 或者在 Gulp 中使用 [envify](https://github.com/hughsk/envify)：
 
   ``` js
-  // 使用 envify 的自定义模块来定制环境变量
+  // 使用 envify 自定义模块指定环境变量
   var envify = require('envify/custom')
 
   browserify(browserifyOptions)
@@ -79,7 +82,7 @@ NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js
         configure: b => b
           .transform('vueify')
           .transform(
-            // 用来处理 `node_modules` 文件
+            // 必填项，以处理 node_modules 里的文件
             { global: true },
             envify({ NODE_ENV: 'production' })
           )
@@ -91,10 +94,10 @@ NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js
 
 #### Rollup
 
-使用 [rollup-plugin-replace](https://github.com/rollup/rollup-plugin-replace)：
+使用 [@rollup/plugin-replace](https://github.com/rollup/plugins/tree/master/packages/replace)：
 
 ``` js
-const replace = require('rollup-plugin-replace')
+const replace = require('@rollup/plugin-replace')
 rollup({
   // ...
   plugins: [

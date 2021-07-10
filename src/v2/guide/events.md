@@ -6,6 +6,8 @@ order: 9
 
 ## 监听事件
 
+<div class="vueschool"><a href="https://learning.dcloud.io/#/?vid=10" target="_blank" rel="sponsored noopener" title="Vue.js 教程 - 事件绑定">观看本节视频讲解</a></div>
+
 可以用 `v-on` 指令监听 DOM 事件，并在触发时运行一些 JavaScript 代码。
 
 示例：
@@ -156,7 +158,9 @@ new Vue({
 methods: {
   warn: function (message, event) {
     // 现在我们可以访问原生事件对象
-    if (event) event.preventDefault()
+    if (event) {
+      event.preventDefault()
+    }
     alert(message)
   }
 }
@@ -173,6 +177,7 @@ methods: {
 - `.capture`
 - `.self`
 - `.once`
+- `.passive`
 
 ``` html
 <!-- 阻止单击事件继续传播 -->
@@ -188,7 +193,7 @@ methods: {
 <form v-on:submit.prevent></form>
 
 <!-- 添加事件监听器时使用事件捕获模式 -->
-<!-- 即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理 -->
+<!-- 即内部元素触发的事件先在此处理，然后才交由内部元素进行处理 -->
 <div v-on:click.capture="doThis">...</div>
 
 <!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
@@ -196,7 +201,7 @@ methods: {
 <div v-on:click.self="doThat">...</div>
 ```
 
-<p class="tip">使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生。因此，用 `@click.prevent.self` 会阻止**所有的点击**，而 `@click.self.prevent` 只会阻止对元素自身的点击。</p>
+<p class="tip">使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生。因此，用 `v-on:click.prevent.self` 会阻止**所有的点击**，而 `v-on:click.self.prevent` 只会阻止对元素自身的点击。</p>
 
 > 2.1.4 新增
 
@@ -205,7 +210,7 @@ methods: {
 <a v-on:click.once="doThis"></a>
 ```
 
-不像其它只能对原生的 DOM 事件起作用的修饰符，`.once` 修饰符还能被用到自定义的[组件事件](components.html#使用-v-on-绑定自定义事件)上。如果你还没有阅读关于组件的文档，现在大可不必担心。
+不像其它只能对原生的 DOM 事件起作用的修饰符，`.once` 修饰符还能被用到自定义的[组件事件](components-custom-events.html)上。如果你还没有阅读关于组件的文档，现在大可不必担心。
 
 > 2.3.0 新增
 
@@ -220,28 +225,36 @@ Vue 还对应 [`addEventListener` 中的 `passive` 选项](https://developer.moz
 
 这个 `.passive` 修饰符尤其能够提升移动端的性能。
 
-<p class="tip">不要把 `.passive` 和 `.prevent` 一起使用，因为 `.prevent` 将会被忽略，同时浏览器可能会向你展示一个警告。请记住，`.passive` 会告诉浏览器你_不_想阻止事件的默认行为。</p>
+<p class="tip">不要把 `.passive` 和 `.prevent` 一起使用，因为 `.prevent` 将会被忽略，同时浏览器可能会向你展示一个警告。请记住，`.passive` 会告诉浏览器你*不*想阻止事件的默认行为。</p>
 
 ## 按键修饰符
 
-在监听键盘事件时，我们经常需要检查常见的键值。Vue 允许为 `v-on` 在监听键盘事件时添加按键修饰符：
+在监听键盘事件时，我们经常需要检查详细的按键。Vue 允许为 `v-on` 在监听键盘事件时添加按键修饰符：
 
 ``` html
-<!-- 只有在 `keyCode` 是 13 时调用 `vm.submit()` -->
+<!-- 只有在 `key` 是 `Enter` 时调用 `vm.submit()` -->
+<input v-on:keyup.enter="submit">
+```
+
+你可以直接将 [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) 暴露的任意有效按键名转换为 kebab-case 来作为修饰符。
+
+``` html
+<input v-on:keyup.page-down="onPageDown">
+```
+
+在上述示例中，处理函数只会在 `$event.key` 等于 `PageDown` 时被调用。
+
+### 按键码
+
+<p class="tip">`keyCode` 的事件用法[已经被废弃了](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode)并可能不会被最新的浏览器支持。</p>
+
+使用 `keyCode` attribute 也是允许的：
+
+``` html
 <input v-on:keyup.13="submit">
 ```
 
-记住所有的 `keyCode` 比较困难，所以 Vue 为最常用的按键提供了别名：
-
-``` html
-<!-- 同上 -->
-<input v-on:keyup.enter="submit">
-
-<!-- 缩写语法 -->
-<input @keyup.enter="submit">
-```
-
-全部的按键别名：
+为了在必要的情况下支持旧浏览器，Vue 提供了绝大多数常用的按键码的别名：
 
 - `.enter`
 - `.tab`
@@ -253,26 +266,14 @@ Vue 还对应 [`addEventListener` 中的 `passive` 选项](https://developer.moz
 - `.left`
 - `.right`
 
-可以通过全局 `config.keyCodes` 对象[自定义按键修饰符别名](../api/#keyCodes)：
+<p class="tip">有一些按键 (`.esc` 以及所有的方向键) 在 IE9 中有不同的 `key` 值, 如果你想支持 IE9，这些内置的别名应该是首选。</p>
+
+你还可以通过全局 `config.keyCodes` 对象[自定义按键修饰符别名](../api/#keyCodes)：
 
 ``` js
 // 可以使用 `v-on:keyup.f1`
 Vue.config.keyCodes.f1 = 112
 ```
-
-### 自动匹配按键修饰符
-
-> 2.5.0 新增
-
-你也可直接将 [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) 暴露的任意有效按键名转换为 kebab-case 来作为修饰符：
-
-```html
-<input @keyup.page-down="onPageDown">
-```
-
-在上面的例子中，处理函数仅在 `$event.key === 'PageDown'` 时被调用。
-
-<p class="tip">有一些按键 (`.esc` 以及所有的方向键) 在 IE9 中有不同的 `key` 值, 如果你想支持 IE9，它们的内置别名应该是首选。</p>
 
 ## 系统修饰键
 
@@ -291,13 +292,13 @@ Vue.config.keyCodes.f1 = 112
 
 ```html
 <!-- Alt + C -->
-<input @keyup.alt.67="clear">
+<input v-on:keyup.alt.67="clear">
 
 <!-- Ctrl + Click -->
-<div @click.ctrl="doSomething">Do something</div>
+<div v-on:click.ctrl="doSomething">Do something</div>
 ```
 
-<p class="tip">请注意修饰键与常规按键不同，在和 `keyup` 事件一起用时，事件触发时修饰键必须处于按下状态。换句话说，只有在按住 `ctrl` 的情况下释放其它按键，才能触发 `keyup.ctrl`。而单单释放 `ctrl` 也不会触发事件。</p>
+<p class="tip">请注意修饰键与常规按键不同，在和 `keyup` 事件一起用时，事件触发时修饰键必须处于按下状态。换句话说，只有在按住 `ctrl` 的情况下释放其它按键，才能触发 `keyup.ctrl`。而单单释放 `ctrl` 也不会触发事件。如果你想要这样的行为，请为 `ctrl` 换用 `keyCode`：`keyup.17`。</p>
 
 ### `.exact` 修饰符
 
@@ -307,13 +308,13 @@ Vue.config.keyCodes.f1 = 112
 
 ``` html
 <!-- 即使 Alt 或 Shift 被一同按下时也会触发 -->
-<button @click.ctrl="onClick">A</button>
+<button v-on:click.ctrl="onClick">A</button>
 
 <!-- 有且只有 Ctrl 被按下的时候才触发 -->
-<button @click.ctrl.exact="onCtrlClick">A</button>
+<button v-on:click.ctrl.exact="onCtrlClick">A</button>
 
 <!-- 没有任何系统修饰符被按下的时候才触发 -->
-<button @click.exact="onClick">A</button>
+<button v-on:click.exact="onClick">A</button>
 ```
 
 ### 鼠标按钮修饰符
@@ -326,7 +327,7 @@ Vue.config.keyCodes.f1 = 112
 
 这些修饰符会限制处理函数仅响应特定的鼠标按钮。
 
-## 为什么在 HTML 中监听事件?
+## 为什么在 HTML 中监听事件？
 
 你可能注意到这种事件监听的方式违背了关注点分离 (separation of concern) 这个长期以来的优良传统。但不必担心，因为所有的 Vue.js 事件处理方法和表达式都严格绑定在当前视图的 ViewModel 上，它不会导致任何维护上的困难。实际上，使用 `v-on` 有几个好处：
 
@@ -334,4 +335,4 @@ Vue.config.keyCodes.f1 = 112
 
 2. 因为你无须在 JavaScript 里手动绑定事件，你的 ViewModel 代码可以是非常纯粹的逻辑，和 DOM 完全解耦，更易于测试。
 
-3. 当一个 ViewModel 被销毁时，所有的事件处理器都会自动被删除。你无须担心如何自己清理它们。
+3. 当一个 ViewModel 被销毁时，所有的事件处理器都会自动被删除。你无须担心如何清理它们。

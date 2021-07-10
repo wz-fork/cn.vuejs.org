@@ -1,5 +1,7 @@
 # Vue.js 中文文档
 
+_注：Vue 3.0 的中文文档请移步至 https://github.com/vuejs/docs-next-zh-cn_
+
 该站点基于 [Hexo](https://hexo.io/) 构建而成。网站内容在 `src` 文件夹内，格式为 Markdown。欢迎 issue 或 pull request。
 
 英文原版仓库地址：https://github.com/vuejs/vuejs.org
@@ -37,4 +39,4 @@ $ npm start # 开发服务器地址为 http://localhost:4000
 
 **感谢所有参与翻译的朋友们！**
 
-目前网站以处于维护状态，最新的文档/翻译贡献情况可以参阅 GitHub 提供的 [contributors](https://github.com/vuejs/cn.vuejs.org/graphs/contributors) 页面。
+目前网站已处于维护状态，最新的文档/翻译贡献情况可以参阅 GitHub 提供的 [contributors](https://github.com/vuejs/cn.vuejs.org/graphs/contributors) 页面。
